@@ -507,7 +507,7 @@ def save_html_report(content, website_url, output_path="gsc_report.html", chart_
         f.write(html)
 
     print(f"\n✅ گزارش HTML ذخیره شد: {output_path}")
-    return output_path
+    return html
 
 
 # ============================================================
@@ -621,8 +621,8 @@ IMPORTANT RULES:
                     "content": json.dumps(result, ensure_ascii=False)
                 })
 
-    save_html_report(final_content, website_url, output_path=output_path, chart_data=chart_data, date_range=date_range)
-    return final_content
+    html_content = save_html_report(final_content, website_url, output_path=output_path, chart_data=chart_data, date_range=date_range)
+    return html_content
 
 
 # ============================================================
