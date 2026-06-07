@@ -1,7 +1,6 @@
 import streamlit as st
 import tempfile
 import os
-import sys
 
 # ============================================================
 # تنظیمات صفحه
@@ -28,13 +27,6 @@ st.markdown("""
         cursor: pointer;
     }
     .stButton > button:hover { opacity: 0.9; }
-    .result-box {
-        background: #f0f7ff;
-        border-right: 4px solid #1a73e8;
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin: 10px 0;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -47,15 +39,10 @@ st.markdown("فایل CSV سرچ کنسول رو آپلود کن و گزارش �
 st.markdown("---")
 
 # ============================================================
-# ورودی‌ها
+# ورودی‌ها — API key از Secrets خونده می‌شه، کاربر نمی‌بینه
 # ============================================================
 
-api_key = st.text_input(
-    "🔑 Groq API Key",
-    type="password",
-    placeholder="gsk_...",
-    help="کلیدت رو از console.groq.com بگیر"
-)
+api_key = st.secrets.get("GROQ_API_KEY", "")
 
 site_url = st.text_input(
     "🌐 آدرس سایت",
@@ -76,7 +63,7 @@ uploaded_file = st.file_uploader(
 if st.button("🚀 شروع تحلیل"):
 
     if not api_key:
-        st.error("❌ لطفاً Groq API Key رو وارد کن.")
+        st.error("❌ مشکل در تنظیمات سرور. با پشتیبانی تماس بگیر.")
         st.stop()
 
     if not uploaded_file:
@@ -85,32 +72,24 @@ if st.button("🚀 شروع تحلیل"):
 
     os.environ["GROQ_API_KEY"] = api_key
 
-    # ذخیره فایل آپلود شده روی دیسک
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp_csv:
         tmp_csv.write(uploaded_file.read())
         csv_path = tmp_csv.name
 
     html_path = csv_path.replace(".csv", "_report.html")
 
-    # اجرای agent با نمایش پیشرفت
     with st.status("🤖 Agent داره کار می‌کنه...", expanded=True) as status:
-
         try:
-            # override توابع print برای نمایش توی Streamlit
-            original_print = __builtins__["print"] if isinstance(__builtins__, dict) else print
-
-            log_lines = []
+            import builtins
+            original_print = builtins.print
 
             def streamlit_print(*args, **kwargs):
                 line = " ".join(str(a) for a in args)
-                log_lines.append(line)
                 if line.strip():
                     st.write(line)
 
-            import builtins
             builtins.print = streamlit_print
 
-            # import و اجرای agent
             import importlib.util
             spec = importlib.util.spec_from_file_location(
                 "gsc_agent",
@@ -130,7 +109,6 @@ if st.button("🚀 شروع تحلیل"):
             os.unlink(csv_path)
             st.stop()
 
-    # نمایش دکمه دانلود
     if os.path.exists(html_path):
         with open(html_path, "r", encoding="utf-8") as f:
             html_content = f.read()
@@ -144,10 +122,8 @@ if st.button("🚀 شروع تحلیل"):
             mime="text/html"
         )
 
-        # پاکسازی فایل‌های موقت
         os.unlink(csv_path)
         os.unlink(html_path)
-
     else:
         st.error("❌ فایل گزارش ساخته نشد. دوباره امتحان کن.")
 
