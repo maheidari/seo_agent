@@ -95,7 +95,7 @@ if st.button("🚀 شروع تحلیل"):
                 "gsc_agent",
                 os.path.join(os.path.dirname(__file__), "gsc_agent.py")
             )
-            gsc_module = importlib.util.load_from_spec(spec)
+            gsc_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(gsc_module)
 
             gsc_module.run_gsc_agent(csv_path, site_url or "نامشخص")
