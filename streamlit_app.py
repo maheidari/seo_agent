@@ -78,6 +78,8 @@ if st.button("🚀 شروع تحلیل"):
 
     html_path = csv_path.replace(".csv", "_report.html")
 
+    html_content = ""
+
     with st.status("🤖 Agent داره کار می‌کنه...", expanded=True) as status:
         try:
             import builtins
@@ -98,7 +100,7 @@ if st.button("🚀 شروع تحلیل"):
             gsc_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(gsc_module)
 
-            gsc_module.run_gsc_agent(csv_path, site_url or "نامشخص", output_path=html_path)
+            html_content = gsc_module.run_gsc_agent(csv_path, site_url or "نامشخص", output_path=html_path)
 
             builtins.print = original_print
             status.update(label="✅ گزارش آماده شد!", state="complete")
@@ -109,23 +111,15 @@ if st.button("🚀 شروع تحلیل"):
             os.unlink(csv_path)
             st.stop()
 
-    if os.path.exists(html_path):
-        with open(html_path, "r", encoding="utf-8") as f:
-            html_content = f.read()
-
+    if html_content:
         st.success("✅ گزارش با موفقیت ساخته شد!")
-
         st.download_button(
             label="⬇️ دانلود گزارش HTML",
             data=html_content,
             file_name="seo_report.html",
             mime="text/html"
         )
-
         os.unlink(csv_path)
-        os.unlink(html_path)
-    else:
-        st.error("❌ فایل گزارش ساخته نشد. دوباره امتحان کن.")
 
 # ============================================================
 # فوتر
