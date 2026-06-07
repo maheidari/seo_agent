@@ -514,7 +514,7 @@ def save_html_report(content, website_url, output_path="gsc_report.html", chart_
 # Agent اصلی
 # ============================================================
 
-def run_gsc_agent(csv_filepath, website_url=""):
+def run_gsc_agent(csv_filepath, website_url="", output_path="gsc_report.html"):
     print(f"\n🤖 Agent شروع به آنالیز داده‌های GSC کرد...\n")
 
     df = load_gsc_data(csv_filepath)
@@ -621,7 +621,7 @@ IMPORTANT RULES:
                     "content": json.dumps(result, ensure_ascii=False)
                 })
 
-    save_html_report(final_content, website_url, chart_data=chart_data, date_range=date_range)
+    save_html_report(final_content, website_url, output_path=output_path, chart_data=chart_data, date_range=date_range)
     return final_content
 
 
