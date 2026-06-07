@@ -98,7 +98,7 @@ if st.button("🚀 شروع تحلیل"):
             gsc_module = importlib.util.module_from_spec(spec)
             spec.loader.exec_module(gsc_module)
 
-            gsc_module.run_gsc_agent(csv_path, site_url or "نامشخص")
+            gsc_module.run_gsc_agent(csv_path, site_url or "نامشخص", output_path=html_path)
 
             builtins.print = original_print
             status.update(label="✅ گزارش آماده شد!", state="complete")
